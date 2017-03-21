@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--自动扫描-->
+    <context:component-scan base-package="com.kaishengit">
+        <!--排除控制器依赖-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--添加数据库连接-->
+    <bean id="dateSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql:///db_22"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+
+
+    </bean>
+    <!--获取hibernate的sessionFactory-->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <!--获取数据库连接-->
+        <property name="dataSource" ref="dateSource"/>
+
+        <!--扫描mapper-->
+        <property name="packagesToScan" value="com.kaishengit.pojo"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="show_sql">true</prop>
+                <prop key="hibernate.dialect">
+                    org.hibernate.dialect.MySQLDialect
+                </prop>
+            </props>
+        </property>
+
+
+    </bean>
+
+    <!--事物管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <!--注解-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+
+</beans>
